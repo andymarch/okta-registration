@@ -1,7 +1,49 @@
 # Registration Demo
 
 This demo is to help show how a custom registration experiance can be created
-for Okta.
+for Okta with email verification for accounts. This replaces the Self Service
+Registeration within the product.
+
+This demo achieves the flow such that:
+
+user requests registration -> email is sent -> user clicks one use link in email
+-> user sets password -> user is redirected.
+
+Additional logic should be added to determine the redirect location, this is
+presently hard coded to a single location.
+
+# App setup
+
+Create a .env file with the following content in the root directory.
+
+```
+SESSION_SECRET=<a random seed value>
+TENANT_URL=https://<your okta tenant>.okta.com
+API_TOKEN=<a API token with at least group admin>
+REDIRECT_URI=https://<your post registration destination>
+```
+
+Run the following from the terminal in that directory
+
+```
+npm install
+npm run start
+```
+
+# Setting Widget Registration URL
+
+To use this application in place of the standard Okta Sign in Widget
+Registration ensure the registration feature is set to true and add the
+following configuration.
+
+```
+// An example that adds a registration button underneath the login form on the primary auth page
+registration: {
+  click: function() {
+    window.location.href = 'https://acme.com/sign-up';
+  }
+}
+```
 
 # Customising email templates
 
