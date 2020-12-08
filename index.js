@@ -3,6 +3,7 @@ const express = require('express');
 const exphbs  = require('express-handlebars');
 const session = require("express-session");
 const okta = require('@okta/okta-sdk-nodejs');
+const axios = require('axios')
 var bodyParser = require('body-parser')
 
 const PORT = process.env.PORT || "3000";
@@ -46,32 +47,24 @@ router.get("/",(req, res, next) => {
 });
 
 router.post("/",urlencodedParser,(req,res,next) => {
+    console.log(req.body)
     const newUser = {
         profile: {
             firstName: req.body.inputGivenName,
             lastName: req.body.inputFamilyName,
             email: req.body.inputEmail,
-            login: req.body.inputEmail
-        },
-        credentials: {
-            password: {
-                value: req.body.inputPassword
-            }
+            login: req.body.inputEmail,
+            locale: req.body.inputLanguage
         }
-        };
+    };
     //register user
-    oktaClient.createUser(newUser, { activate : 'false' })
+    oktaClient.createUser(newUser)
     .then(user => {
-        oktaClient.activateUser(user.id,{sendEmail: 'true'})
-        .then(result =>{
             res.render("postRegistration",{
                 email: req.body.inputEmail
-        })    
-
         })
     })
     .catch(error =>{
-        console.log(JSON.stringify(error))
         var msg;
         if(error.errorCauses){
             msg = error.errorCauses[0].errorSummary
@@ -82,6 +75,86 @@ router.post("/",urlencodedParser,(req,res,next) => {
         res.redirect('/?error='+msg)
     }) 
 })
+
+router.get("/activate/:activationToken",(req, res, next) => {
+    axios.post(process.env.TENANT_URL+'/api/v1/authn',
+    {
+        token: req.params.activationToken
+    },
+    {
+        headers: {
+            "X-Forwarded-For" : req.connection.remoteAddress
+        }
+    })
+    .then(function(transaction) {
+        if(transaction.data.status === 'PASSWORD_RESET'){
+            res.render("activate",{
+                user: req.query.username,
+                stateToken: transaction.data.stateToken
+            })
+        }
+        else {
+            res.redirect('/error')
+        }
+    })
+    .catch(error =>{
+        console.log(error)
+        var msg;
+        if(error.errorCauses){
+            msg = error.errorCauses[0].errorSummary
+        }
+        else {
+            msg = error.message
+        }
+        res.redirect('/?error='+msg)
+    }) 
+    
+});
+
+router.post("/activate",urlencodedParser,(req, res, next) => {
+    axios.post(process.env.TENANT_URL+'/api/v1/authn/credentials/reset_password',
+        {
+            stateToken: req.body.state,
+            newPassword: req.body.inputPassword
+        })
+    .then(result => {
+        axios.post(process.env.TENANT_URL+'/api/v1/authn',
+        {
+            "username": req.body.user,
+            "password": req.body.inputPassword
+        },
+        {
+            headers: {
+                "X-Forwarded-For" : req.connection.remoteAddress
+            }
+        })
+        .then(authn => {
+            console.log(authn.data.status)
+            res.redirect(process.env.TENANT_URL+"/login/sessionCookieRedirect?token="+authn.data.sessionToken+"&redirectUrl="+process.env.REDIRECT_URI)
+        })
+        .catch(error =>{
+            console.log(error)
+            var msg;
+            if(error.errorCauses){
+                msg = error.errorCauses[0].errorSummary
+            }
+            else {
+                msg = error.message
+            }
+            res.redirect('/?error='+msg)
+        }) 
+    }).catch(error =>{
+        console.log(error)
+        var msg;
+        if(error.errorCauses){
+            msg = error.errorCauses[0].errorSummary
+        }
+        else {
+            msg = error.message
+        }
+        res.redirect('/?error='+msg)
+    }) 
+});
 
 app.use(router)
 

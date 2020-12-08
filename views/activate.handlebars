@@ -1,0 +1,14 @@
+<form class="registration-form" action="/activate" method="POST">
+    <div class="text-center mb-4">
+            <i class="far fa-user-circle" id="user-icon"></i>
+            <h1 class="h3 mb-3 font-weight-normal">Thank you for confirming your email</h1>
+            <p>Let's protect your account.</p>
+    </div>
+    <div class="form-label-group">
+        <input type="password" id="inputPassword" name="inputPassword" class="form-control" placeholder="Password" required="">
+        <label for="inputPassword">Password</label>
+    </div>
+    <input type="hidden" id="user" name="user" value="{{user}}"/>
+    <input type="hidden" id="state" name="state" value="{{stateToken}}"/>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Continue</button>
+</form>
