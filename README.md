@@ -12,7 +12,11 @@ user requests registration -> email is sent -> user clicks one use link in email
 Additional logic should be added to determine the redirect location, this is
 presently hard coded to a single location.
 
-# App setup
+# Setup
+
+This implementation makes use of the registration APIs in Okta which are exposed by the Self Service Registration feature. Ensure this is enable and configure the fields you wish to prompt the user for.
+
+## Running Locally
 
 Create a .env file with the following content in the root directory.
 
@@ -30,20 +34,13 @@ npm install
 npm run start
 ```
 
-# Setting Widget Registration URL
+## Running on Heroku
+Deploying to Heroku is the fastest way to get started with this demo. The button
+below will setup a Heroku app with this codebase, you will need to configure the
+application in Okta.
 
-To use this application in place of the standard Okta Sign in Widget
-Registration ensure the registration feature is set to true and add the
-following configuration.
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
-```
-// An example that adds a registration button underneath the login form on the primary auth page
-registration: {
-  click: function() {
-    window.location.href = 'https://acme.com/sign-up';
-  }
-}
-```
 
 # Customising email templates
 
@@ -70,6 +67,22 @@ this is set against the locale value on the users Universal Directory profile.
 Note that if you have customized the email template as described above an
 appropriate translation must be provided for the selected language else english
 will be used.
+
+
+# Setting Widget Registration URL
+
+To use this application in place of the standard Okta Sign in Widget
+Registration ensure the registration feature is set to true and add the
+following configuration.
+
+```
+// An example that adds a registration button underneath the login form on the primary auth page
+registration: {
+  click: function() {
+    window.location.href = 'https://acme.com/sign-up';
+  }
+}
+```
 
 # Customising look and feel
 

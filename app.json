@@ -1,0 +1,28 @@
+{
+    "name": "Okta Custom Registration",
+    "description": "Improve the registration funnel but maintain the admin experiance of SSR.",
+    "repository": "https://github.com/andymarch/okta-registration",
+    "logo": "https://www.okta.com/sites/all/themes/Okta/images/logos/developer/Dev_Logo-02_Large.png",
+    "keywords": ["oauth", "oidc", "okta"],
+    "env": {
+          "TENANT_URL": {
+            "description": "The URI of your teant, this can be either the tenant itself https://<yourname>.okta.com or Okta behind a custom domain",
+            "value": ""
+        },
+        "REDIRECT_URI": {
+          "description": "Where to redirect the user to after registration has been completed.",
+          "value": ""
+        },
+        "SESSION_SECRET":{
+            "description": "A secret key for session data.",
+            "generator": "secret"
+        },
+        "BRANDING_CSS": {
+          "description": "Absolute url to branding css file.",
+          "value": "",
+          "required": false
+        }
+    },
+    "success_url": "/"
+  }
+  
