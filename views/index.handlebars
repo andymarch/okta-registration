@@ -4,25 +4,23 @@
         <h1 class="h3 mb-3 font-weight-normal">Welcome</h1>
         <p>Tell us a little about yourself.</p>
     </div>
-    <div class="form-label-group">
-        <input id="inputGivenName" name="inputGivenName" class="form-control" placeholder="Given Name" required="" autofocus="">
-        <label for="inputGivenName">Given Name</label>
-    </div>
-    <div class="form-label-group">
-        <input id="inputFamilyName" name="inputFamilyName" class="form-control" placeholder="Family Name" required="" autofocus="">
-        <label for="inputFamilyName">Family Name</label>
-    </div>
-    <div class="form-label-group">
-        <input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="Email address" required="" autofocus="">
-        <label for="inputEmail">Email address</label>
-    </div>
-    <div class="form-label-group">
-        <select id="inputLanguage" name="inputLanguage" class="form-control" required="">
-            <option value="en_EN">English</option>
-            <option value="fr_FR">French</option>
-        </select>   
-        <label for="inputLanguage">Preferred Language</label>
-    </div>
+    {{#each fields}}
+        <div class="form-label-group"> 
+            {{#if this.oneOf}}
+                <select id="{{this.key}}" name="{{this.key}}" class="form-control" {{#if this.required}}required{{/if}}>
+                    {{#each this.oneOf}}
+                        <option value="{{this.const}}">{{this.title}}</option>
+                    {{/each}}
+                </select>   
+            {{else}}
+            <input
+            {{#ifCond this.type '==' 'boolean'}}type="checkbox" {{/ifCond}}
+            id="{{this.key}}" name="{{this.key}}" class="form-control" placeholder="{{this.title}}"
+            {{#if this.required}}required{{/if}} autofocus="">
+            {{/if}}
 
+            <label for="{{this.key}}">{{this.title}}{{#if this.required}}<span class="requiredIndicator">*</span>{{/if}}</label>
+        </div>
+    {{/each}}
     <button class="btn btn-lg btn-primary btn-block" type="submit">Create account</button>
 </form>

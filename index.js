@@ -13,6 +13,37 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 var hbs = exphbs.create({
     helpers: {
+        select: function (value, options){
+            return options.fn(this).replace(
+              new RegExp(' value=\"' + value + '\"'),
+              '$& selected="selected"');
+          },
+          ifCond: function (v1, operator, v2, options) {
+            switch (operator) {
+                case '==':
+                    return (v1 == v2) ? options.fn(this) : options.inverse(this);
+                case '===':
+                    return (v1 === v2) ? options.fn(this) : options.inverse(this);
+                case '!=':
+                    return (v1 != v2) ? options.fn(this) : options.inverse(this);
+                case '!==':
+                    return (v1 !== v2) ? options.fn(this) : options.inverse(this);
+                case '<':
+                    return (v1 < v2) ? options.fn(this) : options.inverse(this);
+                case '<=':
+                    return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+                case '>':
+                    return (v1 > v2) ? options.fn(this) : options.inverse(this);
+                case '>=':
+                    return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+                case '&&':
+                    return (v1 && v2) ? options.fn(this) : options.inverse(this);
+                case '||':
+                    return (v1 || v2) ? options.fn(this) : options.inverse(this);
+                default:
+                    return options.inverse(this);
+            }
+          }
     }
 });
 app.engine('handlebars', hbs.engine);
@@ -41,22 +72,40 @@ const oktaClient = new okta.Client({
   
 const router = express.Router();
 router.get("/",(req, res, next) => {
-    res.render("index",{
-        error: req.query.error
-       });
+    axios.get(process.env.TENANT_URL+'/api/v1/registration/form')
+    .then(response => {
+        var fields = []
+        for (let index = 0; index < response.data.profileSchema.fieldOrder.length; index++) {
+            const element = response.data.profileSchema.fieldOrder[index]
+            if(element === 'password') {
+                continue;
+            }
+            var field = response.data.profileSchema.properties[element]
+            field.key = element
+            if(response.data.profileSchema.required.includes(element)){
+                field.required = true
+            }
+            else {
+                field.required = false
+            }
+            fields.push(field)
+        }
+        
+        res.render("index",{
+            fields: fields,
+            error: req.query.error
+        });
+    })
 });
 
 router.post("/",urlencodedParser,(req,res,next) => {
-    console.log(req.body)
+    var profile = req.body
+    profile.login = profile.email
+
     const newUser = {
-        profile: {
-            firstName: req.body.inputGivenName,
-            lastName: req.body.inputFamilyName,
-            email: req.body.inputEmail,
-            login: req.body.inputEmail,
-            locale: req.body.inputLanguage
-        }
+        profile : {}
     };
+    newUser.profile = profile
     //register user
     oktaClient.createUser(newUser)
     .then(user => {
@@ -66,6 +115,7 @@ router.post("/",urlencodedParser,(req,res,next) => {
     })
     .catch(error =>{
         var msg;
+        console.log(error)
         if(error.errorCauses){
             msg = error.errorCauses[0].errorSummary
         }

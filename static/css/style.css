@@ -132,3 +132,14 @@
     color: #777;
   }
   
+  input[type="checkbox"]{
+    top: 8px;
+    position: relative;
+  }
+
+  button[type="submit"]{
+    margin-top: 50px;
+  }
+  .requiredIndicator{
+    color: red;
+  }
