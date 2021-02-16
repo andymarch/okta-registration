@@ -1,26 +1,36 @@
 <form class="registration-form" action="/" method="POST">
     <div class="text-center mb-4">
         <i class="far fa-user-circle" id="user-icon"></i>
-        <h1 class="h3 mb-3 font-weight-normal">Welcome</h1>
+        <h2 class="h2 mb-3 font-weight-normal okta-form-title o-form-head">Welcome</h2>
         <p>Tell us a little about yourself.</p>
     </div>
+    <div class="auth-content">
     {{#each fields}}
         <div class="form-label-group"> 
-            {{#if this.oneOf}}
-                <select id="{{this.key}}" name="{{this.key}}" class="form-control" {{#if this.required}}required{{/if}}>
-                    {{#each this.oneOf}}
-                        <option value="{{this.const}}">{{this.title}}</option>
-                    {{/each}}
-                </select>   
-            {{else}}
-            <input
-            {{#ifCond this.type '==' 'boolean'}}type="checkbox" {{/ifCond}}
-            id="{{this.key}}" name="{{this.key}}" class="form-control" placeholder="{{this.title}}"
-            {{#if this.required}}required{{/if}} autofocus="">
-            {{/if}}
+            {{#ifCond this.type '==' 'boolean'}}
+            <div class="checkboxes">
+                <label for="{{this.key}}"><input type="checkbox" id="{{this.key}}" /> <span>{{this.title}}{{#if this.required}}<span class="requiredIndicator">*</span>{{/if}}</span></label>
+            </div>
+            {{/ifCond}}
+            {{#ifCond this.type '!=' 'boolean'}}
+                {{#if this.oneOf}}
+                    <select id="{{this.key}}" name="{{this.key}}" class="form-control"
+                    {{#if this.required}}required{{/if}}>
+                        {{#each this.oneOf}}
+                            <option value="{{this.const}}">{{this.title}}</option>
+                        {{/each}}
+                    </select>   
+                {{else}}
+                    <input
+                    id="{{this.key}}" name="{{this.key}}" class="form-control" placeholder="{{this.title}}"
+                    {{#if this.required}}required{{/if}} autofocus="">
+                {{/if}}
 
-            <label for="{{this.key}}">{{this.title}}{{#if this.required}}<span class="requiredIndicator">*</span>{{/if}}</label>
+                <label for="{{this.key}}">{{this.title}}{{#if this.required}}<span class="requiredIndicator">*</span>{{/if}}</label>
+            {{/ifCond}}
         </div>
     {{/each}}
     <button class="btn btn-lg btn-primary btn-block" type="submit">Create account</button>
+
+    </div>
 </form>
