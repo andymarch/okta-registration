@@ -17,6 +17,9 @@
             "description": "A secret key for session data.",
             "generator": "secret"
         },
+        "API_TOKEN":{
+          "description": "An admin api token capable of creating users."
+        },
         "BRANDING_CSS": {
           "description": "Absolute url to branding css file.",
           "value": "",
