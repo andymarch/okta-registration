@@ -61,7 +61,6 @@ app.use(session({
 
 app.use(async function (req,res,next){
   res.locals.styling = process.env.BRANDING_CSS
-  res.locals.brand = process.env.BRAND,
   next();
 })
 

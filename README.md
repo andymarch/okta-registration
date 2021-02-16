@@ -70,3 +70,11 @@ this is set against the locale value on the users Universal Directory profile.
 Note that if you have customized the email template as described above an
 appropriate translation must be provided for the selected language else english
 will be used.
+
+# Customising look and feel
+
+Add the following env value with a path to the css file to modify the page appearance.
+
+```
+BRANDING_CSS=<complete uri of css>
+```
