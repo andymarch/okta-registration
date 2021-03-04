@@ -6,7 +6,7 @@ const okta = require('@okta/okta-sdk-nodejs');
 const axios = require('axios')
 var bodyParser = require('body-parser')
 
-const PORT = process.env.PORT || "3010";
+const PORT = process.env.PORT || "3000";
 
 const app = express();
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
