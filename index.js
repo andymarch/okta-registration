@@ -6,7 +6,7 @@ const okta = require('@okta/okta-sdk-nodejs');
 const axios = require('axios')
 var bodyParser = require('body-parser')
 
-const PORT = process.env.PORT || "3000";
+const PORT = process.env.PORT || "3010";
 
 const app = express();
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
@@ -40,10 +40,16 @@ var hbs = exphbs.create({
                     return (v1 && v2) ? options.fn(this) : options.inverse(this);
                 case '||':
                     return (v1 || v2) ? options.fn(this) : options.inverse(this);
+                case 'Hidden':
+                    return (v1.indexOf('Hidden') > -1) ? options.fn(this) : options.inverse(this);
                 default:
                     return options.inverse(this);
             }
-          }
+          },
+          trim: function(passedString) {
+            var theString = passedString.substring(6,100);
+            return theString
+        }
     }
 });
 app.engine('handlebars', hbs.engine);

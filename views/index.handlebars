@@ -19,15 +19,21 @@
                         {{#each this.oneOf}}
                             <option value="{{this.const}}">{{this.title}}</option>
                         {{/each}}
-                    </select>   
+                    </select>
+                    <label for="{{this.key}}">{{this.title}}{{#if this.required}}<span class="requiredIndicator">*</span>{{/if}}</label>   
                 {{else}}
-                    <input
-                    id="{{this.key}}" name="{{this.key}}" class="form-control" placeholder="{{this.title}}"
-                    {{#if this.required}}required{{/if}} autofocus="">
+                    {{#ifCond this.title 'Hidden' ''}}
+                            <input
+                             hidden id="{{this.key}}" name="{{this.key}}" class="form-control" value={{{trim this.title}}}>
+                     {{else}}
+                             <input
+                            id="{{this.key}}" name="{{this.key}}" class="form-control" placeholder="{{this.title}}"
+                            {{#if this.required}}required{{/if}} autofocus="" /> 
+                            <label for="{{this.key}}">{{this.title}}{{#if this.required}}<span class="requiredIndicator">*</span>{{/if}}</label>
+                     {{/ifCond}}
                 {{/if}}
-
-                <label for="{{this.key}}">{{this.title}}{{#if this.required}}<span class="requiredIndicator">*</span>{{/if}}</label>
             {{/ifCond}}
+
         </div>
     {{/each}}
     <button class="btn btn-lg btn-primary btn-block" type="submit">Create account</button>
