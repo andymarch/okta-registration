@@ -5,8 +5,13 @@ const session = require("express-session");
 const okta = require('@okta/okta-sdk-nodejs');
 const axios = require('axios')
 var bodyParser = require('body-parser')
+const flagsmith = require("flagsmith-nodejs")
+flagsmith.init({
+    environmentID: process.env.FLAG_ENV_ID
+});
 
 const PORT = process.env.PORT || "3000";
+
 
 const app = express();
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
@@ -71,35 +76,49 @@ const oktaClient = new okta.Client({
   
 const router = express.Router();
 router.get("/",(req, res, next) => {
-    axios.get(process.env.TENANT_URL+'/api/v1/registration/form')
-    .then(response => {
-        var fields = []
-        for (let index = 0; index < response.data.profileSchema.fieldOrder.length; index++) {
-            const element = response.data.profileSchema.fieldOrder[index]
-            if(element === 'password') {
-                continue;
-            }
-            var field = response.data.profileSchema.properties[element]
-            field.key = element
-            if(response.data.profileSchema.required.includes(element)){
-                field.required = true
-            }
-            else {
-                field.required = false
-            }
-            fields.push(field)
+    flagsmith.hasFeature("registration_fields")
+    .then((featureEnabled) => {
+        if (featureEnabled) {
+            flagsmith.getValue("registration_fields")
+            .then((value) => {
+                 res.render("index",{
+                    fields: JSON.parse(value).fields,
+                    error: req.query.error
+                });
+            });
+
+        } else {
+            axios.get(process.env.TENANT_URL+'/api/v1/registration/form')
+            .then(response => {
+                var fields = []
+                for (let index = 0; index < response.data.profileSchema.fieldOrder.length; index++) {
+                    const element = response.data.profileSchema.fieldOrder[index]
+                    if(element === 'password') {
+                        continue;
+                    }
+                    var field = response.data.profileSchema.properties[element]
+                    field.key = element
+                    if(response.data.profileSchema.required.includes(element)){
+                        field.required = true
+                    }
+                    else {
+                        field.required = false
+                    }
+                    fields.push(field)
+                }
+                
+                res.render("index",{
+                    fields: fields,
+                    error: req.query.error
+                });
+            })
+            .catch((err) => {
+                console.log(err.response.status)
+                if(err.response.status == 429)
+                res.render("rateLimit");
+            })
         }
-        
-        res.render("index",{
-            fields: fields,
-            error: req.query.error
-        });
-    })
-    .catch((err) => {
-        console.log(err.response.status)
-        if(err.response.status == 429)
-        res.render("rateLimit");
-    })
+    });
 });
 
 router.post("/",urlencodedParser,(req,res,next) => {
