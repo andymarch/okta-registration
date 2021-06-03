@@ -68,6 +68,10 @@ const oktaClient = new okta.Client({
     orgUrl: process.env.TENANT_URL,
     token:  process.env.API_TOKEN
 });
+
+const activationBehaviour = process.env.ACTIVATION_BEHAVIOUR;
+const groups = [process.env.GROUP_ID]
+
   
 const router = express.Router();
 router.get("/",(req, res, next) => {
@@ -107,11 +111,12 @@ router.post("/",urlencodedParser,(req,res,next) => {
     profile.login = profile.email
 
     const newUser = {
-        profile : {}
+        profile : {},
+        groupIds: groups
     };
     newUser.profile = profile
     //register user
-    oktaClient.createUser(newUser)
+    oktaClient.createUser(newUser,{ activate : activationBehaviour }
     .then(user => {
             res.render("postRegistration",{
                 email: req.body.inputEmail
