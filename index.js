@@ -135,7 +135,7 @@ router.post("/",urlencodedParser,(req,res,next) => {
     };
     newUser.profile = profile
     //register user
-    oktaClient.createUser(newUser,{ activate : activationBehaviour }
+    oktaClient.createUser(newUser,{ activate : activationBehaviour })
     .then(user => {
             res.render("postRegistration",{
                 email: req.body.inputEmail
