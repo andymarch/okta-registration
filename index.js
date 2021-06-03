@@ -69,7 +69,7 @@ const oktaClient = new okta.Client({
     token:  process.env.API_TOKEN
 });
 
-const activationBehaviour = process.env.ACTIVATION_BEHAVIOUR;
+const activationBehaviour = ((process.env.ACTIVATION_BEHAVIOUR != null) ? process.env.ACTIVATION_BEHAVIOUR : true)
 const groups = [process.env.GROUP_ID]
 
   
